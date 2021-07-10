@@ -1,0 +1,32 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGBUS (0xa) at pc=0x0000000110e19a1b, pid=43373, tid=47623
+#
+# JRE version: OpenJDK Runtime Environment AdoptOpenJDK (11.0.10+9) (build 11.0.10+9)
+# Java VM: OpenJDK 64-Bit Server VM AdoptOpenJDK (11.0.10+9, mixed mode, tiered, compressed oops, parallel gc, bsd-amd64)
+# Problematic frame:
+# J 4901 c1 java.lang.ProcessImpl.initStreams([IZ)V java.base@11.0.10 (419 bytes) @ 0x0000000110e19a1b [0x0000000110e192e0+0x000000000000073b]
+#
+# No core dump will be written. Core dumps have been disabled. To enable core dumping, try "ulimit -c unlimited" before starting Java again
+#
+# If you would like to submit a bug report, please visit:
+#   https://github.com/AdoptOpenJDK/openjdk-support/issues
+#
+
+---------------  S U M M A R Y ------------
+
+Command Line: --add-modules=ALL-SYSTEM --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED -Declipse.application=org.eclipse.jdt.ls.core.id1 -Dosgi.bundles.defaultStartLevel=4 -Declipse.product=org.eclipse.jdt.ls.core.product -Dfile.encoding=utf8 -XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx1G -Xms100m -Xverify:none /Users/diegobenavides/.vscode/extensions/redhat.java-0.80.0/server/plugins/org.eclipse.equinox.launcher_1.6.200.v20210416-2027.jar -configuration /Users/diegobenavides/Library/Application Support/Code/User/globalStorage/redhat.java/0.80.0/config_ss_mac -data /Users/diegobenavides/Library/Application Support/Code/User/workspaceStorage/71c5c1b63676f1c58e417c68ff6e9037/redhat.java/ss_ws
+
+Host: MacBookAir7,2 x86_64 1600 MHz, 4 cores, 8G, Darwin 17.7.0
+Time: Mon Jul  5 17:56:47 2021 -05 elapsed time: 21779.011289 seconds (0d 6h 2m 59s)
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x00007fa22d28c000):  JavaThread "pool-2-thread-1" [_thread_in_Java, id=47623, stack(0x0000700005bca000,0x0000700005cca000)]
+
+Stack: [0x0000700005bca000,0x0000700005cca000],  sp=0x0000700005cc7550,  free space=1013k
+Native frames: (J=compiled Java code, A=aot compiled Java code, j=interpreted, Vv=VM code, C=native code)
+J 4901 c1 java.lang.ProcessImpl.initStreams([IZ)V java.base@11.0.10 (419 bytes) @ 0x0000000110e19a1b [0x0000000110e192e0+0x000000000000073b]
+J 4865 c1 java.lang.ProcessImpl$$Lambda$28.run()Ljava/lang/Object; java.base@11.0.10 (16 bytes) @ 0x0000000110df0a24 [0x0000000110df0960+0x00000000000000c4]
+v  ~StubRoutines::call_stub
