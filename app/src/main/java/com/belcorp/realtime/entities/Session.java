@@ -1,5 +1,5 @@
 
-package messages.generator.entities;
+package com.belcorp.realtime.entities; 
 
 import java.io.IOException;
 import java.util.Date;
