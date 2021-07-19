@@ -37,6 +37,7 @@ import org.apache.flink.streaming.connectors.kinesis.config.ConsumerConfigConsta
 import org.apache.flink.streaming.connectors.kinesis.config.AWSConfigConstants;
 import org.apache.flink.streaming.connectors.kinesis.config.ConsumerConfigConstants;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.CommonClientConfigs;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.common.xcontent.XContentType;
@@ -70,7 +71,7 @@ public class App {
 
 		ParameterTool parameter = ParameterToolUtils.fromArgsAndApplicationProperties(args);
 
-		System.out.println("======>" + parameter.get("InputKinesisStream"));
+		System.out.println("======>" + parameter.get("InputKafkaBootstrapServers"));
 
 		// set up the streaming execution environment
 		final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -78,7 +79,7 @@ public class App {
 
 		DataStream<TripEvent> events;
 
-		if (parameter.has("InputKinesisStream") && (parameter.has("InputKafkaBootstrapServers") || parameter.has("InputKafkaTopic"))) {
+		/*if (parameter.has("InputKinesisStream") && (parameter.has("InputKafkaBootstrapServers") || parameter.has("InputKafkaTopic"))) {
 			throw new RuntimeException("You can only specify a single source, either a Kinesis data stream or a Kafka topic");
 		} else if (parameter.has("InputKinesisStream")) {
 			LOG.info("Reading from {} Kinesis stream", parameter.get("InputKinesisStream"));
@@ -86,27 +87,32 @@ public class App {
 			events = env
 					.addSource(getKinesisSource(parameter))
 					.name("Kinesis source");
-		} else if (parameter.has("InputKafkaBootstrapServers") && parameter.has("InputKafkaTopic")) {
-			LOG.info("Reading from {} Kafka topic", parameter.get("InputKafkaTopic"));
+		} else if (parameter.has("InputKafkaBootstrapServers") && parameter.has("InputKafkaTopic")) {*/
+			//LOG.info("Reading from {} Kafka topic", parameter.get("InputKafkaTopic"));
+			LOG.info("Reading from {} Kafka topic", "AWSKafkaTutorialTopic");
 
 			events = env
-					.addSource(getKafkaSource(parameter))
+					//.addSource(getKafkaSource(parameter))
+					.addSource(getKafkaSource())
 					.name("Kafka source");
-		} else {
+		/*} else {
 			throw new RuntimeException("Missing runtime parameters: Specify 'InputKinesisStreamName' xor ('InputKafkaBootstrapServers' and 'InputKafkaTopic') as a parameters to the Flink job");
-		}
+		}*/
 
 
-		if (parameter.has("OutputBucket")) {
-			LOG.info("Writing to {} buket", parameter.get("OutputBucket"));
+		//if (parameter.has("OutputBucket")) {
+			//LOG.info("Writing to {} buket", parameter.get("OutputBucket"));
+			LOG.info("Writing to {} buket", "belc-bigdata-landing-dlk-dlkdev");
 
 			events
 					.keyBy(TripEvent::getPickupLocationId)
-					.addSink(getS3Sink(parameter))
+					.addSink(
+						//getS3Sink(parameter))
+						getS3Sink())
 					.name("S3 sink");
-		}
+		//}
 
-		if (parameter.has("OutputElasticsearchEndpoint")) {
+		/*if (parameter.has("OutputElasticsearchEndpoint")) {
 			LOG.info("Writing to {} ES endpoint", parameter.has("OutputElasticsearchEndpoint"));
 
 			events
@@ -140,7 +146,7 @@ public class App {
 
 		if (!(parameter.has("OutputDiscarding") || parameter.has("OutputBucket") || parameter.has("OutputElasticsearchEndpoint") || (parameter.has("OutputKafkaBootstrapServers") && parameter.has("OutputKafkaTopic")) || parameter.has("OutputKinesisStream"))) {
 			throw new RuntimeException("Missing runtime parameters: Specify 'OutputDiscarding' or 'OutputBucket' or 'OutputElasticsearchEndpoint' or ('OutputKafkaBootstrapServers' and 'OutputKafkaTopic') as a parameters to the Flink job");
-		}
+		}*/
 
 		env.execute();
     }
@@ -168,14 +174,18 @@ public class App {
 	}
 
 
-	private static SourceFunction<TripEvent> getKafkaSource(ParameterTool parameter) {
-		String topic = parameter.getRequired("InputKafkaTopic");
-		String bootstrapServers = parameter.getRequired("InputKafkaBootstrapServers");
+	//private static SourceFunction<TripEvent> getKafkaSource(ParameterTool parameter) {
+	private static SourceFunction<TripEvent> getKafkaSource() {
+		//String topic = parameter.getRequired("InputKafkaTopic");
+		//String bootstrapServers = parameter.getRequired("InputKafkaBootstrapServers");
+		String topic = "AWSKafkaTutorialTopic";
+		String bootstrapServers = "b-1.amskuse1edlbqas001.wigbm7.c3.kafka.us-east-1.amazonaws.com:9094,b-2.amskuse1edlbqas001.wigbm7.c3.kafka.us-east-1.amazonaws.com:9094";
 
 		Properties properties = new Properties();
 		properties.setProperty("bootstrap.servers", bootstrapServers);
 		properties.setProperty("group.id", "kaja-streaming-etl-consumer");
 		properties.setProperty(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");
+		properties.setProperty(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL");
 
 		return new FlinkKafkaConsumer<>(topic, new TripEventSchema(), properties);
 	}
@@ -205,11 +215,15 @@ public class App {
 	}
 
 
-	private static SinkFunction<TripEvent> getS3Sink(ParameterTool parameter) {
-		String bucket = parameter.getRequired("OutputBucket");
-		String prefix = String.format("%sjob_start=%s/", parameter.get("OutputPrefix", ""), System.currentTimeMillis());
+	//private static SinkFunction<TripEvent> getS3Sink(ParameterTool parameter) {
+		private static SinkFunction<TripEvent> getS3Sink() {
+		//String bucket = parameter.getRequired("OutputBucket");
+		String bucket = "s3://belc-bigdata-landing-dlk-dlkdev/temp/streaming";
+		//String prefix = String.format("%sjob_start=%s/", parameter.get("OutputPrefix", ""), System.currentTimeMillis());
+		String prefix = String.format("%sjob_start=%s/", "kinesis_flink", System.currentTimeMillis());
 
-		if (parameter.getBoolean("ParquetConversion", false)) {
+		//if (parameter.getBoolean("ParquetConversion", false)) {
+		if (false) {
 			return StreamingFileSink
 					.forBulkFormat(
 							new Path(bucket),
