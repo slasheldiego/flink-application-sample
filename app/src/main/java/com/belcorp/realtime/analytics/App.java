@@ -179,7 +179,7 @@ public class App {
 		//String topic = parameter.getRequired("InputKafkaTopic");
 		//String bootstrapServers = parameter.getRequired("InputKafkaBootstrapServers");
 		String topic = "AWSKafkaTutorialTopic";
-		String bootstrapServers = "b-1.amskuse1edlbqas001.wigbm7.c3.kafka.us-east-1.amazonaws.com:9094,b-2.amskuse1edlbqas001.wigbm7.c3.kafka.us-east-1.amazonaws.com:9094";
+		String bootstrapServers = "<your-bootstrap>";
 
 		Properties properties = new Properties();
 		properties.setProperty("bootstrap.servers", bootstrapServers);
